@@ -1,7 +1,4 @@
 package org.fawry.reportapi.model;
-
-
-import lombok.Data;
 public class Kpi {
 
     private Long id;

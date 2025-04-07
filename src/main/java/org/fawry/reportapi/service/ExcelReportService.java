@@ -2,57 +2,103 @@ package org.fawry.reportapi.service;
 
 import org.fawry.reportapi.model.Cycle;
 import org.fawry.reportapi.model.Kpi;
-import org.fawry.reportapi.model.Objective;
 import org.springframework.stereotype.Service;
-
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class ExcelReportService {
 
     public byte[] generateExcel(Cycle cycle) throws IOException {
-            Workbook workbook = new XSSFWorkbook();
-            Sheet sheet = workbook.createSheet("Evaluation Report");
-            int rowIndex =0;
+        if (cycle == null) {
+            throw new IllegalArgumentException("Cycle data is required");
+        }
 
-            Row header = sheet.createRow(rowIndex++);
-            header.createCell(1).setCellValue("Name");
-            header.createCell(2).setCellValue("Start Date");
-            header.createCell(3).setCellValue("End Date");
-            header.createCell(4).setCellValue("State");
-            header.createCell(5).setCellValue("Deadline");
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Cycle Report");
+        int rowIndex = 0;
 
+        // Create header row
+        Row header = sheet.createRow(rowIndex++);
+        createStyledCell(header, 0, "Cycle Name", workbook, true, IndexedColors.GREY_25_PERCENT.getIndex(), false);
+        createStyledCell(header, 1, "Start Date", workbook, true, IndexedColors.GREY_25_PERCENT.getIndex(), false);
+        createStyledCell(header, 2, "End Date", workbook, true, IndexedColors.GREY_25_PERCENT.getIndex(), false);
+        createStyledCell(header, 3, "Status", workbook, true, IndexedColors.GREY_25_PERCENT.getIndex(), false);
+        createStyledCell(header, 4, "KPI", workbook, true, IndexedColors.GREY_25_PERCENT.getIndex(), true);
 
-            Row row = sheet.createRow(rowIndex++);
-            row.createCell(1).setCellValue(cycle.getName());
-            row.createCell(2).setCellValue(cycle.getStartDate().toString());
-            row.createCell(3).setCellValue(cycle.getEndDate().toString());
-            row.createCell(4).setCellValue(cycle.getState());
+        // Create data row
+        Row row = sheet.createRow(rowIndex++);
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+        createStyledCell(row, 0, cycle.getName() != null ? cycle.getName() : "N/A", workbook, false, IndexedColors.WHITE.getIndex(), false);
+        createStyledCell(row, 1, cycle.getStartDate() != null ? cycle.getStartDate().format(dateFormatter) : "N/A", workbook, false, IndexedColors.WHITE.getIndex(), false);
+        createStyledCell(row, 2, cycle.getEndDate() != null ? cycle.getEndDate().format(dateFormatter) : "N/A", workbook, false, IndexedColors.WHITE.getIndex(), false);
+        createStyledCell(row, 3, cycle.getState() != null ? cycle.getState() : "N/A", workbook, false, IndexedColors.WHITE.getIndex(), false);
 
-            sheet.createRow(rowIndex++).createCell(0).setCellValue("KPIs:");
+        StringBuilder kpis = new StringBuilder();
+        if (cycle.getKpis() != null && !cycle.getKpis().isEmpty()) {
             for (Kpi kpi : cycle.getKpis()) {
-                Row kpiRow = sheet.createRow(rowIndex++);
-                kpiRow.createCell(1).setCellValue(kpi.getName());
+                if (kpis.length() > 0) {
+                    kpis.append("\n");  // Use newline character to separate each KPI
+                }
+                kpis.append(kpi.getName());
             }
+        } else {
+            kpis.append("No KPIs available");
+        }
+        createStyledCell(row, 4, kpis.toString(), workbook, false, IndexedColors.WHITE.getIndex(), true);
 
-            rowIndex++;
-            sheet.createRow(rowIndex++).createCell(0).setCellValue("Objectives:");
-            for (Objective objective : cycle.getObjectives()) {
-                Row objRow = sheet.createRow(rowIndex++);
-                objRow.createCell(1).setCellValue(objective.getState());
-               // objRow.createCell(2).setCellValue(objective.getAssignedUserId());
-                objRow.createCell(3).setCellValue(objective.getTitle());
-                objRow.createCell(4).setCellValue(objective.getDescription());
-                objRow.createCell(5).setCellValue(objective.getDeadline().toString());
-            }
+        // Auto size other columns (excluding KPI column)
+        for (int i = 0; i < 4; i++) {
+            sheet.autoSizeColumn(i);
+        }
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            workbook.write(outputStream);
-            return outputStream.toByteArray();
+        // Set specific column width for KPI column and enable wrap text only for the KPI column
+        sheet.setColumnWidth(4, 6000);  // Set a wider column width for the KPI column
+        sheet.getRow(0).getCell(4).getCellStyle().setWrapText(true);  // Enable wrap text for KPI column only
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        return outputStream.toByteArray();
+    }
+
+    private void createStyledCell(Row row, int columnIndex, String value, Workbook workbook, boolean isHeader, short bgColorIndex, boolean wrapText) {
+        Cell cell = row.createCell(columnIndex);
+        cell.setCellValue(value);
+
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+
+        // Apply bold font if it's a header
+        if (isHeader) {
+            font.setBold(true);
+            style.setFont(font);
+            style.setFillForegroundColor(bgColorIndex);
+            style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        } else {
+            font.setBold(false);
+            style.setFont(font);
+        }
+
+        // Apply borders to all cells
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+
+        // Center align text
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+
+        // Enable wrap text for KPI column
+        if (wrapText) {
+            style.setWrapText(true);
+        }
+
+        cell.setCellStyle(style);
     }
 }
-

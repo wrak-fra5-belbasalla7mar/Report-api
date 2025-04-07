@@ -15,7 +15,7 @@ public class EvaluationService {
     }
 
     public Cycle getEvaluationData(Long id) {
-        String url = String.format("http://localhost:8080/cycles/%d", id);
+        String url = String.format("http://localhost:8083/cycles/%d", id);
         return restTemplate.getForObject(url, Cycle.class);
     }
 }

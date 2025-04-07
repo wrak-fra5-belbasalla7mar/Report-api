@@ -1,9 +1,7 @@
 package org.fawry.reportapi.model;
-import lombok.Data;
-
 import java.time.LocalDate;
-
 public class Objective {
+
     private Long id;
     private String state;
     private Long assignedUserId;

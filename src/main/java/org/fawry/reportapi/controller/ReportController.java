@@ -26,12 +26,24 @@ public class ReportController {
     }
 
     @GetMapping("/download/cycle/{id}")
-    public ResponseEntity<byte[]> downloadExcelReport(@PathVariable Long id) throws IOException {
+    public ResponseEntity<?> downloadExcelReport(@PathVariable Long id) throws IOException {
+
         Cycle cycle = evaluationService.getEvaluationData(id);
+
+
         if (cycle == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+
+
         byte[] excelData = excelReportService.generateExcel(cycle);
-        return new ResponseEntity<>(excelData, HttpStatus.OK);
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=cycle_report.xlsx");
+        headers.add("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+
+        return new ResponseEntity<>(excelData, headers, HttpStatus.OK);
     }
 }
