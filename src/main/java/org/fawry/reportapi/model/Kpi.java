@@ -1,4 +1,12 @@
 package org.fawry.reportapi.model;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
 public class Kpi {
 
     private Long id;
@@ -18,14 +26,5 @@ public class Kpi {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-
-    public Kpi(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
-    public Kpi() {
     }
 }

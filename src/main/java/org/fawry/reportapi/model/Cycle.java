@@ -1,8 +1,13 @@
 package org.fawry.reportapi.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
+
 public class Cycle {
 
     private Long id;
@@ -16,7 +21,6 @@ public class Cycle {
     private String state;
     private List<Kpi> kpis;
     private List<Objective> objectives;
-
 
     public Long getId() {
         return id;
@@ -72,18 +76,5 @@ public class Cycle {
 
     public void setObjectives(List<Objective> objectives) {
         this.objectives = objectives;
-    }
-
-    public Cycle(Long id, String name, LocalDate startDate, LocalDate endDate, String state, List<Kpi> kpis, List<Objective> objectives) {
-        this.id = id;
-        this.name = name;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.state = state;
-        this.kpis = kpis;
-        this.objectives = objectives;
-    }
-
-    public Cycle() {
     }
 }

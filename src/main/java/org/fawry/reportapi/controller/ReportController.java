@@ -2,7 +2,7 @@ package org.fawry.reportapi.controller;
 
 import org.fawry.reportapi.model.Cycle;
 import org.fawry.reportapi.service.EvaluationService;
-import org.fawry.reportapi.service.ExcelReportService;
+import org.fawry.reportapi.service.CycleReportService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,25 +18,24 @@ import java.io.IOException;
 public class ReportController {
 
     private final EvaluationService evaluationService;
-    private final ExcelReportService excelReportService;
+    private final CycleReportService cycleReportService;
 
-    public ReportController(EvaluationService evaluationService, ExcelReportService excelReportService) {
+    public ReportController(EvaluationService evaluationService, CycleReportService cycleReportService) {
         this.evaluationService = evaluationService;
-        this.excelReportService = excelReportService;
+        this.cycleReportService = cycleReportService;
     }
 
     @GetMapping("/download/cycle/{id}")
-    public ResponseEntity<?> downloadExcelReport(@PathVariable Long id) throws IOException {
+    public ResponseEntity<?> downloadExcelReportCycle(@PathVariable Long id) throws IOException {
 
-        Cycle cycle = evaluationService.getEvaluationData(id);
+        Cycle cycle = evaluationService.getCycleData(id);
 
 
         if (cycle == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-
-        byte[] excelData = excelReportService.generateExcel(cycle);
+        byte[] excelData = cycleReportService.generateExcel(cycle);
 
 
         HttpHeaders headers = new HttpHeaders();

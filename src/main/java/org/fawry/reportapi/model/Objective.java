@@ -1,5 +1,13 @@
 package org.fawry.reportapi.model;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
+
+
+
 public class Objective {
 
     private Long id;
@@ -64,18 +72,5 @@ public class Objective {
 
     public void setCycleId(Long cycleId) {
         this.cycleId = cycleId;
-    }
-
-    public Objective(Long cycleId, LocalDate deadline, String description, String title, Long assignedUserId, String state, Long id) {
-        this.cycleId = cycleId;
-        this.deadline = deadline;
-        this.description = description;
-        this.title = title;
-        this.assignedUserId = assignedUserId;
-        this.state = state;
-        this.id = id;
-    }
-
-    public Objective() {
     }
 }
