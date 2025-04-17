@@ -25,6 +25,7 @@ public class ReportController {
         this.cycleReportService = cycleReportService;
     }
 
+    // company manager
     @GetMapping("/download/cycle/{id}")
     public ResponseEntity<?> downloadExcelReportCycle(@PathVariable Long id) throws IOException {
 
